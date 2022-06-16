@@ -138,10 +138,7 @@ func proxy(w http.ResponseWriter, r *http.Request) {
 
 func clientAcceptsGzip(r *http.Request) bool {
 	acceptHeader := r.Header.Get("Accept-Encoding")
-	if strings.Contains(acceptHeader, "gzip") {
-		return true
-	}
-	return false
+	return strings.Contains(acceptHeader, "gzip")
 }
 
 func main() {
