@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"flag"
 	"io"
 	"log"
@@ -147,6 +148,9 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/{bucket:[0-9a-zA-Z-_.]+}/{object:.*}", wrapper(proxy)).Methods("GET", "HEAD")
+	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
+	})
 
 	log.Printf("[service] listening on %s", *bind)
 	if err := http.ListenAndServe(*bind, r); err != nil {
