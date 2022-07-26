@@ -7,6 +7,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -139,6 +140,11 @@ func clientAcceptsGzip(r *http.Request) bool {
 	return strings.Contains(acceptHeader, "gzip")
 }
 
+func doShutdown(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Performing shutdown by client request")
+	os.Exit(0)
+}
+
 func main() {
 	flag.Parse()
 
@@ -157,6 +163,7 @@ func main() {
 	r.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	})
+	r.HandleFunc("/shutdown", wrapper(doShutdown)).Methods("GET", "HEAD")
 
 	log.Printf("[service] listening on %s", *bind)
 	if err := http.ListenAndServe(*bind, r); err != nil {
